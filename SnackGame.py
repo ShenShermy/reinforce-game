@@ -278,7 +278,7 @@ class SnakeGame:
         """获取增强的状态表示（17个特征）"""
         head = self.snake[0]
         
-        # 1. 危险检测（增强版）
+        # 1. 危险检测
         dangers = self._get_enhanced_dangers(head)
         
         # 2. 移动方向
