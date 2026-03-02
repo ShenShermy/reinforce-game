@@ -461,17 +461,14 @@ class SnakeGame:
     def play_step(self, action=None):
         """
         执行一步游戏
-        
         参数:
             action: AI选择的动作，如果为None则由人类玩家控制
-            
         返回:
             tuple: (奖励, 游戏是否结束, 当前分数)
         """
         # 初始化奖励
         reward = 0
         old_score = self.score
-        
         if self.ai_mode and action is not None:
             # AI控制：将动作转换为方向
             self._ai_action_to_direction(action)
@@ -485,7 +482,6 @@ class SnakeGame:
             old_distance = self._get_manhattan_distance(head_before, self.food)
             if self.last_distance is None:
                 self.last_distance = old_distance
-        
         # 移动蛇
         self.move_snake()
         
@@ -494,11 +490,9 @@ class SnakeGame:
             # 记录当前头部位置用于原地转圈检测
             current_head = self.snake[0]
             self.head_position_history.append(current_head)
-            
             # 更新步数计数器
             self.total_steps += 1
             self.steps_without_food += 1
-            
             # 如果游戏结束，给予大的惩罚
             if self.game_over:
                 # 死亡惩罚（根据原因调整）
@@ -506,40 +500,30 @@ class SnakeGame:
                     reward = -80  # 撞墙惩罚更重
                 else:
                     reward = -30  # 撞自己
-                
                 # 如果是早期就死亡，惩罚更大
                 if self.total_steps < 20:
                     reward *= 1.5
-                
                 self._reset_training_state()
-                
             else:
                 # 检查是否吃到食物
                 ate_food = self.score > old_score
-                
                 if ate_food:
                     # 吃到食物的主要奖励
-                    reward = 5000
-                    
+                    reward = 5000 
                     # 奖励效率：步数越少，奖励越高
                     efficiency_bonus = max(0, 5 - self.steps_without_food / 10)
                     reward += efficiency_bonus
-                    
                     # 重置饥饿计数器
                     self.steps_without_food = 0
-                    
                     # 根据身体长度给予额外奖励
                     length_bonus = len(self.snake) * 2
                     reward += length_bonus
-                    
                 else:
                     # 密集奖励：基于距离变化
                     head_after = self.snake[0]
                     new_distance = self._get_manhattan_distance(head_after, self.food)
-                    
-                    # 距离变化奖励（核心）
-                    distance_change = self.last_distance - new_distance
-                    
+                    # 距离变化奖励（核心）防止蛇不吃食物只靠近食物
+                    distance_change = self.last_distance - new_distance                    
                     if distance_change > 0:
                         # 距离缩短：给予与缩短距离成正比的奖励
                         reward = 2 * (1 + distance_change * 1)
@@ -548,29 +532,23 @@ class SnakeGame:
                         reward = -1 * (1 + abs(distance_change) * 0.3)
                     else:
                         # 距离不变：轻微惩罚
-                        reward = -0.1
-                    
+                        reward = -0.1                   
                     # 更新距离记录
-                    self.last_distance = new_distance
-                    
+                    self.last_distance = new_distance                
                     # 安全奖励：避免靠近墙壁和身体
                     safety_reward = self._calculate_safety_reward(head_after)
-                    reward += safety_reward * 0.2  # 安全系数
-                    
+                    reward += safety_reward * 0.2  # 安全系数                 
                     # 检测原地转圈行为 - 巨大惩罚
                     if self._detect_circling():
                         circling_penalty = -100  # 原地转圈的巨大惩罚
-                        reward += circling_penalty
-                    
+                        reward += circling_penalty                   
                     # 探索奖励：鼓励探索新区域
                     if self.total_steps % 50 == 0 and len(self.snake) < 5:
-                        reward += 0.5
-                    
+                        reward += 0.5                  
                     # 饥饿惩罚：长时间没吃到食物
                     if self.steps_without_food > 50:
                         hunger_penalty = (self.steps_without_food - 50) * 0.01
-                        reward -= hunger_penalty
-                    
+                        reward -= hunger_penalty                  
                     # 存活奖励：每步微小奖励，鼓励存活
                     reward += 1
         # else:
