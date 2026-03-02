@@ -1,5 +1,8 @@
 **QlearningSnakeGame**
 
+![Desktop 2026 03 02 - 18 59 47 02 DVR](https://github.com/user-attachments/assets/70636e1d-a2d3-4d2e-b983-0cbc4e943c00)
+
+
 This project implements a classic Snake game with an AI agent trained using Deep Q-Learning (DQN) algorithm. The game supports both human player mode and AI training mode, allowing for comparison between human and AI performance.
 
 reinforce-game/
